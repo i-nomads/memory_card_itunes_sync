@@ -6,7 +6,7 @@ require 'yaml'
 require 'cgi'
 require 'fileutils'
 
-doc = File.open("/Users/clabesse/Dropbox/iTunes/iTunes\ Music\ Library.xml") { |f| Nokogiri::PList(f) }
+doc = File.open("./Library.xml") { |f| Nokogiri::PList(f) }
 to_sync = YAML.load_file("./playlists.yml")
 base_dir = "#{Dir.pwd}/tmp_sync"
 
@@ -51,13 +51,13 @@ to_sync.each do |volume, playlists|
       if File.exists?(target)
         print "exists already.\n"
       else
-        FileUtils.cp(track_location, target)
+        FileUtils.cp(track_location, target) unless track_location.include?('http')
         print "done.\n"
       end
     end
 
     puts "*** Syncing '#{playlist}' to SD card"
-    `rsync --links #{base_dir}/#{playlist.gsub(' ', '\ ')}/* /Volumes/#{volume.gsub(' ', '\ ')}/#{playlist.gsub(' ', '\ ')}`
+    `rsync --links #{base_dir}/#{playlist.gsub(' ', '\ ')}/ /Volumes/#{volume.gsub(' ', '\ ')}/#{playlist.gsub(' ', '\ ')}`
   end
 end
 
